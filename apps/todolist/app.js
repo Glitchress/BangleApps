@@ -36,12 +36,6 @@ let DEFAULT_TODOLIST = [
   },
 ];
 
-var resetmenu = {
-    "" : { title : "-- Reset? --"},
-    "Yes" : function() { resetStatus(todolist); }, // do nothing
-    "No" : function() { showMainMenu(); } // do nothing
-};
-
 // Load todolist
 let todolist =
   require("Storage").readJSON(TODOLIST_FILE, true) || DEFAULT_TODOLIST;
@@ -89,7 +83,14 @@ function toggleableStatus(todolist, indexes, index) {
   };
 }
 
-function resetStatus(todolist) {
+var resetMenu = {
+    "" : { title : "-- Reset? --"},
+    "Yes" : function() { resetStatus(); }, // do nothing
+    "No" : function() { showMainMenu(); } // do nothing
+};
+
+
+function resetStatus() {
   let todolistString= JSON.stringify(todolist).replace(/true/g, false);
   console.log(todolistString);
   todolist = JSON.parse(todolistString);
@@ -143,7 +144,7 @@ function createMenus(todolist, indexes) {
     menuItem[name] = createListItem(todolist, indexes, i);
   }
   if (ismain == true) {
-     menuItem["Reset List"] = { onchange : function() { E.showMenu(resetmenu); },
+     menuItem["Reset List"] = { onchange : function() { E.showMenu(resetMenu); },
                               format : () => (">")};
   }
   menus[indexes] = menuItem;
