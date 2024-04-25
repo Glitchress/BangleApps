@@ -83,6 +83,23 @@ function toggleableStatus(todolist, indexes, index) {
   };
 }
 
+var resetMenu = {
+    "" : { title : "-- Reset? --"},
+    "Yes" : function() { resetStatus(); }, // do nothing
+    "No" : function() { showMainMenu(); } // do nothing
+};
+
+
+function resetStatus() {
+  let todolistString= JSON.stringify(todolist).replace(/true/g, false);
+  console.log(todolistString);
+  todolist = JSON.parse(todolistString);
+
+  writeData();
+  createMenus(todolist, []);
+  showMainMenu();
+}
+
 function showSubMenu(key) {
   const sub_menu = menus[key];
   return E.showMenu(sub_menu);
@@ -105,22 +122,30 @@ function createListItem(todolist, indexes, index) {
 
 function showMainMenu() {
   const mainmenu = menus[""];
+
   return E.showMenu(mainmenu);
 }
 
 function createMenus(todolist, indexes) {
   const menuItem = {};
+  let ismain = false;
   if (indexes.length == 0) {
     menuItem[""] = { title: "todolist" };
+    ismain = true;
   } else {
     menuItem[""] = { title: getParentTitle(todolist, indexes) };
     menuItem["< Back"] = () =>
       showSubMenu(indexes.slice(0, indexes.length - 1));
+    ismain = false;
   }
   for (let i = 0; i < getChild(todolist, indexes).length; i++) {
     const item = getItem(todolist, indexes, i);
     const name = getName(item);
     menuItem[name] = createListItem(todolist, indexes, i);
+  }
+  if (ismain == true) {
+     menuItem["Reset List"] = { onchange : function() { E.showMenu(resetMenu); },
+                              format : () => (">")};
   }
   menus[indexes] = menuItem;
 }
